@@ -1,9 +1,30 @@
-# GitHub Actions workflow - to be configured in Step 7
 name: Daily LinkedIn Agent
+
 on:
+  schedule:
+    - cron: "30 3 * * *"
   workflow_dispatch:
+
 jobs:
-  placeholder:
+  run-agent:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "placeholder"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: python agent.py
