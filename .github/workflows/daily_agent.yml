@@ -1,0 +1,9 @@
+# GitHub Actions workflow - to be configured in Step 7
+name: Daily LinkedIn Agent
+on:
+  workflow_dispatch:
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "placeholder"
