@@ -1,4 +1,0 @@
-feedparser
-anthropic
-requests
-beautifulsoup4
