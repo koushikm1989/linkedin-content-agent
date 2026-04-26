@@ -48,21 +48,22 @@ HEADERS = {
 }
 
 
-def fetch_rss_articles(feeds: list[str]) -> list[dict]:
-    """Fetch articles from Reddit and Google News RSS feeds."""
-    cutoff = datetime.now() - timedelta(hours=48)
+def fetch_rss_articles(feeds: list[str], max_age_hours: int = None) -> list[dict]:
+    """Fetch articles from RSS feeds. If max_age_hours is set, filters by recency."""
     articles = []
+    cutoff = datetime.now() - timedelta(hours=max_age_hours) if max_age_hours else None
 
     for url in feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:8]:
-                try:
-                    published = datetime(*entry.published_parsed[:6])
-                    if published < cutoff:
-                        continue
-                except Exception:
-                    pass
+            for entry in feed.entries[:15]:
+                if cutoff:
+                    try:
+                        published = datetime(*entry.published_parsed[:6])
+                        if published < cutoff:
+                            continue
+                    except Exception:
+                        pass
 
                 articles.append({
                     "title":   entry.get("title", "").strip(),
