@@ -138,33 +138,38 @@ def fetch_blog_articles(urls: list[str]) -> list[dict]:
 
 # ── CLAUDE ───────────────────────────────────────────────────────────────────
 
-def rank_and_draft(articles: list[dict]) -> str:
-    """Send all articles to Claude Haiku. Get top 2 + LinkedIn drafts back."""
+def rank_and_draft(reddit_articles: list[dict], other_articles: list[dict]) -> str:
+    """Send articles to Claude Haiku. Force 1 from Reddit, 1 from other sources."""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-    numbered = "\n\n".join([
-        f"[{i+1}] Title: {a['title']}\n"
-        f"Source: {a['source']}\n"
-        f"URL: {a['link']}\n"
-        f"Summary: {a['summary'] or 'No summary available'}"
-        for i, a in enumerate(articles[:40])
-    ])
+    def format_list(articles, label):
+        return f"── {label} ──\n\n" + "\n\n".join([
+            f"[{i+1}] Title: {a['title']}\n"
+            f"Source: {a['source']}\n"
+            f"URL: {a['link']}\n"
+            f"Summary: {a['summary'] or 'No summary available'}"
+            for i, a in enumerate(articles[:20])
+        ])
+
+    reddit_block = format_list(reddit_articles, "REDDIT ARTICLES (pick exactly 1)")
+    other_block  = format_list(other_articles,  "OTHER SOURCES — Google News / Medium / Blogs (pick exactly 1)")
 
     prompt = f"""You are a LinkedIn content strategist for a Product Manager based in India.
 Today is {datetime.now().strftime('%B %d, %Y')}.
 
-Below are recent articles from Reddit, Google News, Medium, and PM blogs.
+You MUST pick exactly:
+- 1 article from the REDDIT section
+- 1 article from the OTHER SOURCES section
 
-Your tasks:
-1. Pick the TOP 2 articles that will get the most LinkedIn engagement from a PM / tech professional audience. Prioritise: unique insight, career relevance, AI in product, India tech scene. Avoid memes and low-value posts.
-2. For each article write a LinkedIn post of 150-200 words: start with a strong hook, share 3 key insights as short punchy lines, end with a question to drive comments. Tone: professional but conversational.
+For each article write a LinkedIn post of 150-200 words: strong hook, 3 punchy insights, closing question to drive comments. Tone: professional but conversational.
 
-ARTICLES:
-{numbered}
+{reddit_block}
+
+{other_block}
 
 Respond in this exact format and nothing else:
 
-ARTICLE 1:
+ARTICLE 1 (from Reddit):
 Title: [title]
 URL: [url]
 Source: [source]
@@ -175,7 +180,7 @@ LINKEDIN POST 1:
 
 ---
 
-ARTICLE 2:
+ARTICLE 2 (from Other Sources):
 Title: [title]
 URL: [url]
 Source: [source]
@@ -229,27 +234,32 @@ def send_email(content: str):
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 
 def main():
-    print("Step 1/4 — Fetching RSS feeds (Reddit + Google News)...")
-    rss_articles = fetch_rss_articles(REDDIT_FEEDS + GOOGLE_NEWS_FEEDS)
-    print(f"  Found {len(rss_articles)} RSS articles")
+    print("Step 1/5 — Fetching Reddit RSS (historical, no date limit)...")
+    reddit_articles = fetch_rss_articles(REDDIT_FEEDS, max_age_hours=None)
+    print(f"  Found {len(reddit_articles)} Reddit articles")
 
-    print("Step 2/4 — Scraping Medium profiles...")
+    print("Step 2/5 — Fetching Google News RSS (recent 48 hours only)...")
+    google_articles = fetch_rss_articles(GOOGLE_NEWS_FEEDS, max_age_hours=48)
+    print(f"  Found {len(google_articles)} Google News articles")
+
+    print("Step 3/5 — Scraping Medium profiles (historical)...")
     medium_articles = fetch_medium_articles(MEDIUM_URLS)
     print(f"  Found {len(medium_articles)} Medium articles")
 
-    print("Step 3/4 — Scraping PM blogs...")
+    print("Step 4/5 — Scraping PM blogs (historical)...")
     blog_articles = fetch_blog_articles(BLOG_URLS)
     print(f"  Found {len(blog_articles)} blog articles")
 
-    all_articles = rss_articles + medium_articles + blog_articles
-    print(f"\nTotal articles collected: {len(all_articles)}")
+    other_articles = google_articles + medium_articles + blog_articles
 
-    if not all_articles:
+    print(f"\nTotal — Reddit: {len(reddit_articles)} | Others: {len(other_articles)}")
+
+    if not reddit_articles and not other_articles:
         print("No articles found today. Exiting.")
         return
 
-    print("\nStep 4/4 — Sending to Claude Haiku for ranking and drafting...")
-    content = rank_and_draft(all_articles)
+    print("\nStep 5/5 — Sending to Claude Haiku for ranking and drafting...")
+    content = rank_and_draft(reddit_articles, other_articles)
 
     print("\nSending email...")
     send_email(content)
