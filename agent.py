@@ -139,11 +139,11 @@ def fetch_blog_articles(urls: list[str]) -> list[dict]:
 # ── CLAUDE ───────────────────────────────────────────────────────────────────
 
 def rank_and_draft(reddit_articles: list[dict], other_articles: list[dict]) -> str:
-    """Send articles to Claude Haiku. Force 1 from Reddit, 1 from other sources."""
+    """Two separate Claude calls — one forces Reddit pick, one forces Other pick."""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
-    def format_list(articles, label):
-        return f"── {label} ──\n\n" + "\n\n".join([
+    def format_list(articles):
+        return "\n\n".join([
             f"[{i+1}] Title: {a['title']}\n"
             f"Source: {a['source']}\n"
             f"URL: {a['link']}\n"
@@ -151,51 +151,43 @@ def rank_and_draft(reddit_articles: list[dict], other_articles: list[dict]) -> s
             for i, a in enumerate(articles[:20])
         ])
 
-    reddit_block = format_list(reddit_articles, "REDDIT ARTICLES (pick exactly 1)")
-    other_block  = format_list(other_articles,  "OTHER SOURCES — Google News / Medium / Blogs (pick exactly 1)")
-
-    prompt = f"""You are a LinkedIn content strategist for a Product Manager based in India.
+    def call_claude(articles, source_label):
+        prompt = f"""You are a LinkedIn content strategist for a Product Manager based in India.
 Today is {datetime.now().strftime('%B %d, %Y')}.
 
-You MUST pick exactly:
-- 1 article from the REDDIT section
-- 1 article from the OTHER SOURCES section
+From the list below, pick the SINGLE best article for a PM/tech professional LinkedIn audience.
+Prioritise: unique insight, career relevance, AI in product, India tech scene.
 
-For each article write a LinkedIn post of 150-200 words: strong hook, 3 punchy insights, closing question to drive comments. Tone: professional but conversational.
+{format_list(articles)}
 
-{reddit_block}
+Then write a LinkedIn post of 150-200 words: strong hook, 3 punchy insights, closing question.
+Tone: professional but conversational.
 
-{other_block}
+Respond in this exact format:
 
-Respond in this exact format and nothing else:
-
-ARTICLE 1 (from Reddit):
+ARTICLE ({source_label}):
 Title: [title]
 URL: [url]
 Source: [source]
 Why picked: [one sentence]
 
-LINKEDIN POST 1:
-[full post text]
-
----
-
-ARTICLE 2 (from Other Sources):
-Title: [title]
-URL: [url]
-Source: [source]
-Why picked: [one sentence]
-
-LINKEDIN POST 2:
+LINKEDIN POST:
 [full post text]"""
 
-    message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=1500,
-        messages=[{"role": "user", "content": prompt}],
-    )
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=800,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        return message.content[0].text
 
-    return message.content[0].text
+    print("  Picking best Reddit article...")
+    reddit_result = call_claude(reddit_articles, "from Reddit")
+
+    print("  Picking best article from Other Sources...")
+    other_result  = call_claude(other_articles, "from Google News / Medium / Blogs")
+
+    return f"{reddit_result}\n\n---\n\n{other_result}"
 
 
 # ── EMAIL ─────────────────────────────────────────────────────────────────────
