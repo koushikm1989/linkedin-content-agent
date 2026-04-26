@@ -55,7 +55,10 @@ def fetch_rss_articles(feeds: list[str], max_age_hours: int = None) -> list[dict
 
     for url in feeds:
         try:
-            feed = feedparser.parse(url)
+            feed = feedparser.parse(
+                url,
+                agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
             for entry in feed.entries[:15]:
                 if cutoff:
                     try:
@@ -141,6 +144,11 @@ def fetch_blog_articles(urls: list[str]) -> list[dict]:
 def rank_and_draft(reddit_articles: list[dict], other_articles: list[dict]) -> str:
     """Two separate Claude calls — one forces Reddit pick, one forces Other pick."""
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+    if not reddit_articles:
+        reddit_articles = [{"title": "No Reddit articles found", "link": "", "summary": "", "source": "Reddit"}]
+    if not other_articles:
+        other_articles = [{"title": "No articles found from other sources", "link": "", "summary": "", "source": "Other"}]
 
     def format_list(articles):
         return "\n\n".join([
