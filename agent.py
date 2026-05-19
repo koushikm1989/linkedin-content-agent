@@ -302,11 +302,21 @@ Why picked: [one sentence]
 LINKEDIN POST:
 [full post text]"""
 
-    message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=800,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    import time
+    for attempt in range(3):
+        try:
+            message = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=800,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            break
+        except Exception as e:
+            if "overloaded" in str(e).lower() and attempt < 2:
+                print(f"  Anthropic overloaded, retrying in 30s... (attempt {attempt+1})")
+                time.sleep(30)
+            else:
+                raise
 
     response_text = message.content[0].text
 
