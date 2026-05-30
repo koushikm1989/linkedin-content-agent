@@ -4,6 +4,7 @@ import requests
 import smtplib
 import os
 import re
+import time
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -26,6 +27,13 @@ GOOGLE_NEWS_FEEDS = [
     "https://news.google.com/rss/search?q=product+management&hl=en-IN&gl=IN&ceid=IN:en",
     "https://news.google.com/rss/search?q=AI+product+management&hl=en-IN&gl=IN&ceid=IN:en",
     "https://news.google.com/rss/search?q=product+manager+career&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=artificial+intelligence+breakthrough&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=science+discovery&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=technology+innovation&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=education+future+learning&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=sports+inspiring+comeback&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=motivational+success+story&hl=en-IN&gl=IN&ceid=IN:en",
+    "https://news.google.com/rss/search?q=startup+founder+story&hl=en-IN&gl=IN&ceid=IN:en",
 ]
 
 MEDIUM_URLS = [
@@ -66,13 +74,13 @@ YOUTUBE_HANDLES = [
 
 POOL_META = {
     "Reddit":      {"color": "#ff4500", "emoji": "👾", "bg": "#fff8f6"},
-    "Google News": {"color": "#4285f4", "emoji": "📰", "bg": "#f6f9ff"},
-    "Medium":      {"color": "#000000", "emoji": "✍️", "bg": "#f9f9f9"},
-    "Blog":        {"color": "#1a73e8", "emoji": "📝", "bg": "#f6f9ff"},
+    "Google News": {"color": "#1a73e8", "emoji": "📰", "bg": "#f6f9ff"},
+    "Medium":      {"color": "#292929", "emoji": "✍️", "bg": "#f7f7f7"},
+    "Blog":        {"color": "#0f5bbf", "emoji": "📝", "bg": "#f6f9ff"},
     "LinkedIn":    {"color": "#0077b5", "emoji": "💼", "bg": "#f0f7fb"},
-    "Pinterest":   {"color": "#e60023", "emoji": "📌", "bg": "#fff6f7"},
-    "YouTube":     {"color": "#ff0000", "emoji": "▶️", "bg": "#fff8f8"},
-    "Unknown":     {"color": "#888888", "emoji": "🔗", "bg": "#fafafa"},
+    "Pinterest":   {"color": "#ad081b", "emoji": "📌", "bg": "#fff6f7"},
+    "YouTube":     {"color": "#cc0000", "emoji": "▶️", "bg": "#fff8f8"},
+    "Unknown":     {"color": "#444444", "emoji": "🔗", "bg": "#fafafa"},
 }
 
 # ── HELPERS ───────────────────────────────────────────────────────────────────
@@ -84,16 +92,10 @@ HEADERS = {
         "Chrome/120.0.0.0 Safari/537.36"
     )
 }
-
-FEEDPARSER_AGENT = (
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/120.0.0.0 Safari/537.36"
-)
+FEEDPARSER_AGENT = HEADERS["User-Agent"]
 
 
 def extract_image(entry) -> str:
-    """Try every known location an image URL might live in an RSS entry."""
     if hasattr(entry, "media_thumbnail") and entry.media_thumbnail:
         return entry.media_thumbnail[0].get("url")
     if hasattr(entry, "media_content") and entry.media_content:
@@ -121,7 +123,6 @@ def fetch_rss_articles(feeds: list[str], max_age_hours: int = None) -> list[dict
     """Generic RSS fetcher. max_age_hours=None means no date filter (historical)."""
     articles = []
     cutoff = datetime.now() - timedelta(hours=max_age_hours) if max_age_hours else None
-
     for url in feeds:
         try:
             feed = feedparser.parse(url, agent=FEEDPARSER_AGENT)
@@ -143,12 +144,10 @@ def fetch_rss_articles(feeds: list[str], max_age_hours: int = None) -> list[dict
                 })
         except Exception as e:
             print(f"  RSS error ({url}): {e}")
-
     return articles
 
 
 def get_youtube_channel_rss(handle: str) -> str:
-    """Fetch a YouTube channel page and extract its RSS feed URL from the HTML."""
     try:
         resp = requests.get(
             f"https://www.youtube.com/{handle}", headers=HEADERS, timeout=10
@@ -169,7 +168,6 @@ def get_youtube_channel_rss(handle: str) -> str:
 
 
 def fetch_youtube_articles(handles: list[str]) -> list[dict]:
-    """Resolve YouTube @handles to RSS feeds and fetch recent videos."""
     articles = []
     for handle in handles:
         rss_url = get_youtube_channel_rss(handle)
@@ -190,14 +188,13 @@ def fetch_youtube_articles(handles: list[str]) -> list[dict]:
                     "image":   thumbnail,
                     "pool":    "YouTube",
                 })
-            print(f"  {handle}: {len(feed.entries[:5])} videos fetched")
+            print(f"  {handle}: {len(feed.entries[:5])} videos")
         except Exception as e:
             print(f"  YouTube RSS error ({handle}): {e}")
     return articles
 
 
 def fetch_medium_articles(urls: list[str]) -> list[dict]:
-    """Scrape recent article titles and links from Medium profile pages."""
     articles = []
     for url in urls:
         try:
@@ -217,12 +214,8 @@ def fetch_medium_articles(urls: list[str]) -> list[dict]:
                         img = img_tag.get("src") or img_tag.get("data-src")
                 if title and len(title) > 15:
                     articles.append({
-                        "title":   title,
-                        "link":    link,
-                        "summary": "",
-                        "source":  url,
-                        "image":   img,
-                        "pool":    "Medium",
+                        "title": title, "link": link, "summary": "",
+                        "source": url, "image": img, "pool": "Medium",
                     })
         except Exception as e:
             print(f"  Medium scrape error ({url}): {e}")
@@ -230,7 +223,6 @@ def fetch_medium_articles(urls: list[str]) -> list[dict]:
 
 
 def fetch_blog_articles(urls: list[str]) -> list[dict]:
-    """Scrape article titles and links from PM blogs."""
     articles = []
     for url in urls:
         try:
@@ -251,12 +243,8 @@ def fetch_blog_articles(urls: list[str]) -> list[dict]:
                         img = img_tag.get("src") or img_tag.get("data-src")
                 if title and len(title) > 15:
                     articles.append({
-                        "title":   title,
-                        "link":    link,
-                        "summary": "",
-                        "source":  url,
-                        "image":   img,
-                        "pool":    "Blog",
+                        "title": title, "link": link, "summary": "",
+                        "source": url, "image": img, "pool": "Blog",
                     })
         except Exception as e:
             print(f"  Blog scrape error ({url}): {e}")
@@ -266,7 +254,7 @@ def fetch_blog_articles(urls: list[str]) -> list[dict]:
 # ── CLAUDE ────────────────────────────────────────────────────────────────────
 
 def pick_best(client, articles: list[dict], source_label: str) -> dict:
-    """One Claude call: pick the single best article and write a LinkedIn post."""
+    """One Claude call: pick the single best article and write a LinkedIn post in Koushik's voice."""
     if not articles:
         return None
 
@@ -278,18 +266,26 @@ def pick_best(client, articles: list[dict], source_label: str) -> dict:
         for i, a in enumerate(articles[:20])
     ])
 
-    prompt = f"""You are a LinkedIn content strategist for a Product Manager based in India.
-Today is {datetime.now().strftime('%B %d, %Y')}.
+    prompt = f"""You are writing a LinkedIn post in the voice of Koushik Mukherjee, a Lead Product Owner (B2B SaaS).
 
+Today is {datetime.now().strftime('%B %d, %Y')}.
 Source pool: {source_label}
 
-Pick the SINGLE best article for a PM/tech professional LinkedIn audience.
-Prioritise: unique insight, career relevance, AI in product, India tech scene.
+From the list below, pick the SINGLE best article for a thoughtful PM / tech professional audience.
+Prioritise: a sharp insight, a counterintuitive angle, AI in product, career growth, or a genuinely witty/motivational hook from science, tech, education, or sports.
 
 {numbered}
 
-Write a LinkedIn post of 150-200 words: strong hook, 3 punchy insights,
-closing question. Tone: professional but conversational.
+KOUSHIK'S VOICE — study and match it closely:
+- Open with a bold, punchy one-line thesis. Often a contrast: "brilliant at X, still figuring out Y." No throat-clearing.
+- Two registers depending on the article:
+  (a) ANALYTICAL TEARDOWN for PM/tech/business articles — decode the situation, cite specific numbers if available, name the tension, offer a crisp insight. Use phrases like "Here's what made this land for me" or "the quietly uncomfortable bit".
+  (b) WITTY OBSERVER for lighter/meme/motivational/sports articles — dry, self-aware, a little playful. Sparing use of !!! and an emoji like 😬 or 🥳 is fine here (max 1-2 emojis, never more).
+- First person and personal. He shares his own take and "places his bet". Optimistic and principled — he cares about building responsibly and making things better.
+- Use arrow bullets (→) for any list of 2-4 points. Bold 1-2 key phrases max.
+- ALWAYS end with a genuine open question that invites the reader to weigh in.
+- Length 150-200 words. No corporate jargon, no hashtag stuffing (2-4 relevant hashtags max at the very end).
+- Never fabricate statistics. Only cite numbers that appear in the article summary.
 
 Respond in EXACTLY this format:
 
@@ -300,14 +296,14 @@ Source: [source]
 Why picked: [one sentence]
 
 LINKEDIN POST:
-[full post text]"""
+[full post in Koushik's voice]"""
 
-    import time
+    message = None
     for attempt in range(3):
         try:
             message = client.messages.create(
                 model="claude-haiku-4-5-20251001",
-                max_tokens=800,
+                max_tokens=900,
                 messages=[{"role": "user", "content": prompt}],
             )
             break
@@ -327,44 +323,45 @@ LINKEDIN POST:
         if 0 <= idx < len(articles):
             picked_index = idx
 
-    return {
-        "article":  articles[picked_index],
-        "response": response_text,
-    }
+    return {"article": articles[picked_index], "response": response_text}
 
 
-def rank_and_draft(
-    reddit: list[dict],
-    google_other: list[dict],
-    new_sources: list[dict],
-) -> list[dict]:
+def rank_and_draft(reddit, google_other, new_sources) -> list[dict]:
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     results = []
+    picked_urls = set()
 
-    print("  Article 1 — picking from Reddit...")
-    r1 = pick_best(client, reddit, "REDDIT")
-    if r1:
-        results.append(r1)
+    def add_pick(pool, label):
+        candidates = [a for a in pool if a["link"] not in picked_urls]
+        if not candidates:
+            return
+        r = pick_best(client, candidates, label)
+        if r:
+            results.append(r)
+            picked_urls.add(r["article"]["link"])
 
-    print("  Article 2 — picking from Google News / Medium / Blogs...")
-    r2 = pick_best(client, google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
-    if r2:
-        results.append(r2)
+    # 2 from Reddit
+    print("  Picks 1-2 — Reddit...")
+    add_pick(reddit, "REDDIT")
+    add_pick(reddit, "REDDIT")
 
-    print("  Article 3 — picking from LinkedIn / Pinterest / YouTube...")
-    r3 = pick_best(client, new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
-    if r3:
-        results.append(r3)
+    # 3 from Google News / Medium / Blogs
+    print("  Picks 3-5 — Google News / Medium / Blogs...")
+    add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
+    add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
+    add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
 
-    print("  Article 4 — wildcard best from all sources...")
-    picked_urls = {r["article"]["link"] for r in results}
-    remaining = [
-        a for a in (reddit + google_other + new_sources)
-        if a["link"] not in picked_urls
-    ]
-    r4 = pick_best(client, remaining, "ALL SOURCES — wildcard best pick")
-    if r4:
-        results.append(r4)
+    # 3 from LinkedIn / Pinterest / YouTube
+    print("  Picks 6-8 — LinkedIn / Pinterest / YouTube...")
+    add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
+    add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
+    add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
+
+    # 2 wildcards from everything remaining
+    print("  Picks 9-10 — wildcard from all sources...")
+    all_pool = reddit + google_other + new_sources
+    add_pick(all_pool, "ALL SOURCES — wildcard")
+    add_pick(all_pool, "ALL SOURCES — wildcard")
 
     return results
 
@@ -395,11 +392,13 @@ def build_html_email(results: list[dict]) -> str:
         image_html = ""
         if article.get("image"):
             image_html = f"""
-            <div style="margin:16px 0;border-radius:10px;overflow:hidden;
-                        box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-              <img src="{article['image']}" alt="Article image"
-                   style="width:100%;max-height:280px;object-fit:cover;display:block;">
-            </div>"""
+            <tr>
+              <td style="padding:0 0 18px 0;line-height:0;">
+                <img src="{article['image']}" alt="" width="100%"
+                     style="display:block;width:100%;max-height:260px;
+                            object-fit:cover;border-radius:10px;">
+              </td>
+            </tr>"""
 
         post_lines = (
             linkedin_post
@@ -407,105 +406,124 @@ def build_html_email(results: list[dict]) -> str:
             .replace("\n", "<br>")
         )
 
-        source_badge = f"""
-        <span style="display:inline-block;background:{color};color:#fff;
-                     font-size:11px;font-weight:700;padding:3px 10px;
-                     border-radius:20px;letter-spacing:0.5px;">
-          {emoji} {pool}
-        </span>"""
-
-        article_num_label = f"Article {i+1} of {len(results)}"
-
         sections.append(f"""
-<div style="background:{bg};border:1px solid #e8e8e8;border-radius:14px;
-            margin-bottom:32px;overflow:hidden;
-            box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="margin-bottom:28px;border-radius:14px;overflow:hidden;
+              border:1px solid #e8e8e8;
+              box-shadow:0 4px 16px rgba(0,0,0,0.06);">
 
   <!-- Colour strip header -->
-  <div style="background:{color};padding:12px 24px;">
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="color:#fff;font-size:13px;font-weight:600;
-                   letter-spacing:0.5px;opacity:0.9;">{article_num_label}</td>
-        <td align="right" style="color:#fff;font-size:12px;opacity:0.75;">
-          {datetime.now().strftime("%a, %d %b %Y")}
-        </td>
-      </tr>
-    </table>
-  </div>
-
-  <div style="padding:24px;">
-
-    <!-- Source badge -->
-    <div style="margin-bottom:12px;">{source_badge}</div>
-
-    <!-- Title -->
-    <h2 style="margin:0 0 10px;font-size:20px;line-height:1.35;font-weight:700;">
-      <a href="{article['link']}"
-         style="color:#111;text-decoration:none;">{article['title']}</a>
-    </h2>
-
-    <!-- Source name -->
-    <p style="color:#888;font-size:12px;margin:0 0 4px;">
-      🔗 {article['source']}
-    </p>
-
-    <!-- Why picked -->
-    {"<p style='color:#666;font-size:13px;font-style:italic;margin:6px 0 0;'>💡 " + why + "</p>" if why else ""}
-
-    <!-- Image -->
-    {image_html}
-
-    <!-- Divider -->
-    <div style="border-top:1px solid #e0e0e0;margin:20px 0;"></div>
-
-    <!-- LinkedIn post label -->
-    <div style="margin-bottom:10px;">
-      <span style="font-size:12px;font-weight:700;color:{color};
-                   text-transform:uppercase;letter-spacing:0.8px;">
-        ✍️ LinkedIn Post Draft
-      </span>
-    </div>
-
-    <!-- Post body -->
-    <div style="background:#fff;border-left:4px solid {color};
-                padding:18px 20px;border-radius:0 10px 10px 0;
-                font-size:14px;line-height:1.85;color:#333;
-                box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-      {post_lines}
-    </div>
-
-    <!-- CTA row -->
-    <div style="margin-top:18px;">
-      <table cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="background:{color};padding:12px 24px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-          <td style="padding-right:10px;">
-            <a href="{article['link']}"
-               style="background:{color};color:#fff;padding:10px 22px;
-                      border-radius:8px;text-decoration:none;font-size:13px;
-                      font-weight:600;display:inline-block;">
-              Read Full Article →
-            </a>
+          <td style="font-family:Arial,sans-serif;color:#ffffff;
+                     font-size:13px;font-weight:700;letter-spacing:0.5px;">
+            Article {i+1} of {len(results)}
           </td>
-          <td>
-            <span style="background:#f0f0f0;color:#555;padding:10px 16px;
-                         border-radius:8px;font-size:12px;display:inline-block;">
-              📋 Copy &amp; paste into LinkedIn
+          <td align="right">
+            <span style="font-family:Arial,sans-serif;
+                         background:rgba(255,255,255,0.22);color:#ffffff;
+                         font-size:11px;font-weight:700;padding:3px 10px;
+                         border-radius:20px;">
+              {emoji} {pool}
             </span>
           </td>
         </tr>
       </table>
-    </div>
+    </td>
+  </tr>
 
-  </div>
-</div>""")
+  <!-- Card body -->
+  <tr>
+    <td style="background:{bg};padding:24px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
 
-    # Source pills for the quick-nav bar
+        {image_html}
+
+        <tr>
+          <td style="padding-bottom:8px;">
+            <h2 style="font-family:Arial,sans-serif;margin:0;
+                       font-size:19px;line-height:1.35;font-weight:800;
+                       color:#111111;">
+              <a href="{article['link']}" target="_blank"
+                 style="color:#111111;text-decoration:none;">{article['title']}</a>
+            </h2>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-bottom:6px;">
+            <span style="font-family:Arial,sans-serif;font-size:12px;
+                         color:#888888;">🔗 {article['source'][:60]}</span>
+          </td>
+        </tr>
+
+        {"<tr><td style='padding-bottom:6px;'><span style='font-family:Arial,sans-serif;font-size:13px;font-style:italic;color:#666666;'>💡 " + why + "</span></td></tr>" if why else ""}
+
+        <tr>
+          <td style="padding:14px 0;">
+            <div style="border-top:1px solid #e0e0e0;"></div>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-bottom:10px;">
+            <span style="font-family:Arial,sans-serif;font-size:12px;
+                         font-weight:700;color:{color};
+                         text-transform:uppercase;letter-spacing:0.8px;">
+              ✍️ LinkedIn Post Draft
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#ffffff;border-left:4px solid {color};
+                     padding:16px 18px;border-radius:0 10px 10px 0;">
+            <p style="font-family:Arial,sans-serif;margin:0;font-size:14px;
+                      line-height:1.85;color:#333333;">
+              {post_lines}
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding-top:18px;">
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="background:{color};border-radius:8px;">
+                  <a href="{article['link']}" target="_blank"
+                     style="font-family:Arial,sans-serif;display:inline-block;
+                            color:#ffffff !important;font-size:13px;
+                            font-weight:700;padding:11px 22px;
+                            text-decoration:none;border-radius:8px;">
+                    Read Full Article &rarr;
+                  </a>
+                </td>
+                <td style="padding-left:10px;">
+                  <span style="font-family:Arial,sans-serif;background:#f0f0f0;
+                               color:#555555;padding:11px 16px;
+                               border-radius:8px;font-size:12px;
+                               display:inline-block;">
+                    📋 Copy &amp; paste into LinkedIn
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>""")
+
     source_pills = "".join([
-        f'<span style="background:{POOL_META.get(r["article"].get("pool","Unknown"), POOL_META["Unknown"])["color"]};'
-        f'color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;'
-        f'font-weight:600;display:inline-block;margin:3px;">'
-        f'{POOL_META.get(r["article"].get("pool","Unknown"), POOL_META["Unknown"])["emoji"]} '
+        f'<span style="font-family:Arial,sans-serif;display:inline-block;'
+        f'background:{POOL_META.get(r["article"].get("pool","Unknown"),POOL_META["Unknown"])["color"]};'
+        f'color:#ffffff;padding:4px 12px;border-radius:20px;font-size:12px;'
+        f'font-weight:700;margin:3px;">'
+        f'{POOL_META.get(r["article"].get("pool","Unknown"),POOL_META["Unknown"])["emoji"]} '
         f'{r["article"].get("pool","Unknown")}</span>'
         for r in results
     ])
@@ -519,53 +537,77 @@ def build_html_email(results: list[dict]) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Your Daily LinkedIn Content</title>
 </head>
-<body style="margin:0;padding:0;background:#f4f6f9;
-             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f4f6f9;">
 
-  <div style="max-width:680px;margin:0 auto;padding:32px 16px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;">
 
-    <!-- Header -->
-    <div style="background:linear-gradient(135deg,#0077b5 0%,#005885 100%);
-                padding:36px 32px;border-radius:16px;margin-bottom:28px;
-                text-align:center;box-shadow:0 8px 24px rgba(0,119,181,0.25);">
-      <div style="font-size:40px;margin-bottom:10px;">📰</div>
-      <h1 style="color:#fff;margin:0 0 8px;font-size:24px;font-weight:700;
-                 letter-spacing:-0.5px;">Your Daily LinkedIn Content</h1>
-      <p style="color:#cce5ff;margin:0 0 16px;font-size:15px;">{date_str}</p>
-      <div style="display:inline-block;background:rgba(255,255,255,0.15);
-                  padding:6px 20px;border-radius:20px;">
-        <span style="color:#fff;font-size:13px;">
-          {len(results)} articles curated across {unique_sources} source types
-        </span>
-      </div>
-    </div>
+        <!-- Header -->
+        <tr>
+          <td style="background:#0077b5;padding:36px 32px;border-radius:16px;
+                     text-align:center;">
+            <div style="font-size:40px;margin-bottom:10px;">📰</div>
+            <h1 style="font-family:Arial,sans-serif;color:#ffffff;margin:0 0 8px;
+                       font-size:24px;font-weight:800;letter-spacing:-0.5px;">
+              Your Daily LinkedIn Content
+            </h1>
+            <p style="font-family:Arial,sans-serif;color:#cce5ff;margin:0 0 16px;
+                       font-size:15px;">{date_str}</p>
+            <span style="font-family:Arial,sans-serif;display:inline-block;
+                         background:rgba(255,255,255,0.15);padding:6px 20px;
+                         border-radius:20px;color:#ffffff;font-size:13px;">
+              {len(results)} articles curated across {unique_sources} source types
+            </span>
+          </td>
+        </tr>
 
-    <!-- Source pills -->
-    <div style="background:#fff;padding:16px 20px;border-radius:12px;
-                margin-bottom:28px;border:1px solid #e8e8e8;
-                box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <p style="margin:0 0 10px;font-size:11px;color:#888;
-                text-transform:uppercase;letter-spacing:0.8px;font-weight:600;">
-        Today's sources
-      </p>
-      <div>{source_pills}</div>
-    </div>
+        <tr><td style="height:24px;">&nbsp;</td></tr>
 
-    <!-- Article cards -->
-    {"".join(sections)}
+        <!-- Source pills -->
+        <tr>
+          <td style="background:#ffffff;padding:16px 20px;border-radius:12px;
+                     border:1px solid #e8e8e8;">
+            <p style="font-family:Arial,sans-serif;margin:0 0 10px;font-size:11px;
+                       color:#888888;text-transform:uppercase;
+                       letter-spacing:0.8px;font-weight:700;">
+              Today's sources
+            </p>
+            <div>{source_pills}</div>
+          </td>
+        </tr>
 
-    <!-- Footer -->
-    <div style="text-align:center;padding:24px 0;
-                border-top:1px solid #e0e0e0;margin-top:8px;">
-      <p style="color:#aaa;font-size:12px;margin:0 0 4px;">
-        Generated by your LinkedIn Content Agent
-      </p>
-      <p style="color:#bbb;font-size:11px;margin:0;">
-        Powered by Claude Haiku &middot; Running on GitHub Actions
-      </p>
-    </div>
+        <tr><td style="height:28px;">&nbsp;</td></tr>
 
-  </div>
+        <!-- Article cards -->
+        <tr>
+          <td>
+            {"".join(sections)}
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="text-align:center;padding:24px 0;
+                     border-top:1px solid #e0e0e0;">
+            <p style="font-family:Arial,sans-serif;color:#aaaaaa;font-size:12px;
+                       margin:0 0 4px;">
+              Generated by your LinkedIn Content Agent
+            </p>
+            <p style="font-family:Arial,sans-serif;color:#bbbbbb;font-size:11px;
+                       margin:0;">
+              Pioneered by Koushik &middot; Powered by Claude Haiku &middot;
+              Running on GitHub Actions
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>"""
 
@@ -642,10 +684,11 @@ def main():
         print("No articles found. Exiting.")
         return
 
-    print("\nStep 6/6 — Claude Haiku: 4 independent picks...")
+    print("\nStep 6/6 — Claude Haiku: 10 independent picks...")
     results = rank_and_draft(reddit, google_other, new_sources)
+    print(f"  {len(results)} articles selected")
 
-    print("Sending HTML email with images...")
+    print("\nSending HTML email with images...")
     send_email(results)
     print("Done!")
 
