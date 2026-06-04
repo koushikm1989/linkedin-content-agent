@@ -5,10 +5,16 @@ import smtplib
 import os
 import re
 import time
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
+
+# ── MEMORY CONFIG ─────────────────────────────────────────────────────────────
+
+HISTORY_FILE = "history.json"
+HISTORY_DAYS = 7  # Don't repeat any article shared in the last 7 days
 
 # ── SOURCES ───────────────────────────────────────────────────────────────────
 
@@ -95,6 +101,61 @@ HEADERS = {
 FEEDPARSER_AGENT = HEADERS["User-Agent"]
 
 
+# ── MEMORY: 7-DAY ARTICLE HISTORY ─────────────────────────────────────────────
+
+def load_recent_links() -> set:
+    """Return the set of all article links shared in the last HISTORY_DAYS days."""
+    if not os.path.exists(HISTORY_FILE):
+        print("  No history file yet — starting fresh.")
+        return set()
+    try:
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            history = json.load(f)
+    except Exception as e:
+        print(f"  Could not read history file: {e}")
+        return set()
+
+    cutoff = (datetime.now() - timedelta(days=HISTORY_DAYS)).strftime("%Y-%m-%d")
+    recent = set()
+    for entry in history:
+        if entry.get("date", "") >= cutoff:
+            recent.update(entry.get("links", []))
+    return recent
+
+
+def save_history(new_links: list[str]):
+    """Append today's links, prune anything older than HISTORY_DAYS, write back."""
+    history = []
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                history = json.load(f)
+        except Exception:
+            history = []
+
+    today  = datetime.now().strftime("%Y-%m-%d")
+    cutoff = (datetime.now() - timedelta(days=HISTORY_DAYS)).strftime("%Y-%m-%d")
+
+    # Drop entries outside the rolling window
+    history = [e for e in history if e.get("date", "") >= cutoff]
+
+    # Merge into today's entry if the agent already ran today, else add new entry
+    todays_entry = next((e for e in history if e.get("date") == today), None)
+    if todays_entry:
+        merged = set(todays_entry.get("links", [])) | set(new_links)
+        todays_entry["links"] = sorted(merged)
+    else:
+        history.append({"date": today, "links": sorted(set(new_links))})
+
+    try:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(history, f, indent=2)
+        print(f"  History updated: +{len(new_links)} links, "
+              f"{len(history)} day(s) tracked in the {HISTORY_DAYS}-day window.")
+    except Exception as e:
+        print(f"  Could not write history file: {e}")
+
+
 def extract_image(entry) -> str:
     if hasattr(entry, "media_thumbnail") and entry.media_thumbnail:
         return entry.media_thumbnail[0].get("url")
@@ -120,7 +181,6 @@ def extract_image(entry) -> str:
 
 
 def fetch_rss_articles(feeds: list[str], max_age_hours: int = None) -> list[dict]:
-    """Generic RSS fetcher. max_age_hours=None means no date filter (historical)."""
     articles = []
     cutoff = datetime.now() - timedelta(hours=max_age_hours) if max_age_hours else None
     for url in feeds:
@@ -326,10 +386,11 @@ LINKEDIN POST:
     return {"article": articles[picked_index], "response": response_text}
 
 
-def rank_and_draft(reddit, google_other, new_sources) -> list[dict]:
+def rank_and_draft(reddit, google_other, new_sources, recent_links: set) -> list[dict]:
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     results = []
-    picked_urls = set()
+    # Seed with the 7-day memory so already-shared articles are skipped automatically
+    picked_urls = set(recent_links)
 
     def add_pick(pool, label):
         candidates = [a for a in pool if a["link"] not in picked_urls]
@@ -340,24 +401,20 @@ def rank_and_draft(reddit, google_other, new_sources) -> list[dict]:
             results.append(r)
             picked_urls.add(r["article"]["link"])
 
-    # 2 from Reddit
     print("  Picks 1-2 — Reddit...")
     add_pick(reddit, "REDDIT")
     add_pick(reddit, "REDDIT")
 
-    # 3 from Google News / Medium / Blogs
     print("  Picks 3-5 — Google News / Medium / Blogs...")
     add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
     add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
     add_pick(google_other, "GOOGLE NEWS / MEDIUM / BLOGS")
 
-    # 3 from LinkedIn / Pinterest / YouTube
     print("  Picks 6-8 — LinkedIn / Pinterest / YouTube...")
     add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
     add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
     add_pick(new_sources, "LINKEDIN / PINTEREST / YOUTUBE")
 
-    # 2 wildcards from everything remaining
     print("  Picks 9-10 — wildcard from all sources...")
     all_pool = reddit + google_other + new_sources
     add_pick(all_pool, "ALL SOURCES — wildcard")
@@ -412,7 +469,6 @@ def build_html_email(results: list[dict]) -> str:
               border:1px solid #e8e8e8;
               box-shadow:0 4px 16px rgba(0,0,0,0.06);">
 
-  <!-- Colour strip header -->
   <tr>
     <td style="background:{color};padding:12px 24px;">
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -434,7 +490,6 @@ def build_html_email(results: list[dict]) -> str:
     </td>
   </tr>
 
-  <!-- Card body -->
   <tr>
     <td style="background:{bg};padding:24px;">
       <table width="100%" cellpadding="0" cellspacing="0">
@@ -544,7 +599,6 @@ def build_html_email(results: list[dict]) -> str:
     <td align="center" style="padding:32px 16px;">
       <table width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;">
 
-        <!-- Header -->
         <tr>
           <td style="background:#0077b5;padding:36px 32px;border-radius:16px;
                      text-align:center;">
@@ -565,7 +619,6 @@ def build_html_email(results: list[dict]) -> str:
 
         <tr><td style="height:24px;">&nbsp;</td></tr>
 
-        <!-- Source pills -->
         <tr>
           <td style="background:#ffffff;padding:16px 20px;border-radius:12px;
                      border:1px solid #e8e8e8;">
@@ -580,14 +633,12 @@ def build_html_email(results: list[dict]) -> str:
 
         <tr><td style="height:28px;">&nbsp;</td></tr>
 
-        <!-- Article cards -->
         <tr>
           <td>
             {"".join(sections)}
           </td>
         </tr>
 
-        <!-- Footer -->
         <tr>
           <td style="text-align:center;padding:24px 0;
                      border-top:1px solid #e0e0e0;">
@@ -637,6 +688,10 @@ def send_email(results: list[dict]):
 # ── MAIN ──────────────────────────────────────────────────────────────────────
 
 def main():
+    print("Loading 7-day article memory...")
+    recent_links = load_recent_links()
+    print(f"  {len(recent_links)} links in memory — these will be skipped.\n")
+
     print("Step 1/6 — Reddit RSS (historical)...")
     reddit = fetch_rss_articles(REDDIT_FEEDS, max_age_hours=None)
     for a in reddit:
@@ -684,12 +739,20 @@ def main():
         print("No articles found. Exiting.")
         return
 
-    print("\nStep 6/6 — Claude Haiku: 10 independent picks...")
-    results = rank_and_draft(reddit, google_other, new_sources)
+    print("\nStep 6/6 — Claude Haiku: 10 independent picks (skipping 7-day memory)...")
+    results = rank_and_draft(reddit, google_other, new_sources, recent_links)
     print(f"  {len(results)} articles selected")
+
+    if not results:
+        print("Everything available was already shared this week. Nothing to send.")
+        return
 
     print("\nSending HTML email with images...")
     send_email(results)
+
+    print("\nSaving today's articles to memory...")
+    save_history([r["article"]["link"] for r in results])
+
     print("Done!")
 
 
