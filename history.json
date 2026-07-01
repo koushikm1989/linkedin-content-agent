@@ -1,20 +1,5 @@
 [
   {
-    "date": "2026-06-23",
-    "links": [
-      "https://news.google.com/rss/articles/CBMi5gFBVV95cUxPdVRDWXVzdDVEeFY3OFc1NDhlUGNnbXk1X3Rub2VuQ2ZwbGlzdXJxZnA1T20ydXhfMlFPUzROX29nS05BR05NR2lzdC1HdXFUVktNbXNRSUlXQ1RNc1hHNnNieGxkbmhuYjJhWWItVnNrZUVURVI4VDBQZ0dfenBOeXRtcnpwOTZCbG9nSjZyUTlZdk43R21QaUJ4MFJZZkRJNWJidVNFLVNCZ1hEdndwWkUtbE80VUMzbWJFR21tYm9faEJ3RnBtNWNBOHRzSlloblVnMmdFaFZ4WE9uc1ZDRzdCM0MyUQ?oc=5",
-      "https://news.google.com/rss/articles/CBMidEFVX3lxTE1FSU90V0VLQkdqTmFlUmNmLXhWNV9EdTI2Q3RLY2NmajUxWmo5RXd2VUlyNDdrYXQtYlpFNm1Da3pjMGVlU2VZWk42RkJYZ0t1WXBPdnFXSFI4cVZNNWhtSVVmVERwVXQwQzVhMmVBWGZLV3pk?oc=5",
-      "https://news.google.com/rss/articles/CBMingFBVV95cUxQY1JZOG51bml2cTd6d05oX1M0ZzRnRzlxdzY0aG04elozMEZUNXY0ckFqdVl3WDhZQzVudFJrZ1VvMV90c19JLWtFbDltUkZXSXBMZkJBUkk1TW14N3dGa05VSzZ0eG0tS3ZuSGJtYnlSb25kZDJ3SnJMdXJaY21PVVE5em9CS09BNndzVkpsNlo1THNSblB3SkRKdkVkdw?oc=5",
-      "https://www.reddit.com/r/ProductManagement/comments/1ucq7wm/whats_the_most_overengineered_product_or_internal/",
-      "https://www.reddit.com/r/ProductManagement/comments/1ud3bnz/claude_code_team_badsad_tracking/",
-      "https://www.reddit.com/r/ProductManagement/comments/1ud52gy/can_you_develop_an_eye_for_design/",
-      "https://www.reddit.com/r/ProductManagement/comments/1ud8sbo/standing_at_the_crossroads_what_would_you_do/",
-      "https://www.youtube.com/shorts/Dh50sbzOXfE",
-      "https://www.youtube.com/watch?v=RSsF9pWpSRA",
-      "https://www.youtube.com/watch?v=xm3Y3u2GP4g"
-    ]
-  },
-  {
     "date": "2026-06-24",
     "links": [
       "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNQkR5RVNmczVfcGpIa2RzNGdqVFJrOENQcTg1b1BYS0doUF9NdElnSTk4eDFnRkFZTTVHYXpNUUFhblVLUWFka0tZMzN2VXdTRHlGQU5PUk85MlAwRU5uMnhBbGNLaE1tSWRWbUFBZnVfUENRUnNTeUFxa3F1Zm9zSTZBaDlzRHd6NGh3U1FhQ09RTWxBQVUxU3VqbDE2VEpmcDYzajVHVDduNHhPZklzOEFpNTVVeEx4X1Z1ZXd1UmlQdHVhUjREcGx3a3RqdzEzTkE?oc=5",
@@ -72,6 +57,21 @@
       "https://www.youtube.com/watch?v=CvLLYBWAXjY",
       "https://www.youtube.com/watch?v=ODIX_aLMOTc",
       "https://www.youtube.com/watch?v=PLYf5OAEI3k"
+    ]
+  },
+  {
+    "date": "2026-07-01",
+    "links": [
+      "https://news.google.com/rss/articles/CBMib0FVX3lxTE1CeWxKclh1MmNaNzBtSXNFRzVMUXhwY3BUSEhKa1ZOZWRENWF4ZTRldDJTY3piVmhVYkxja0tfVFdrZUxGdlNDZGdDcUlWQzlKV0RUbU96WXhQcHR2cmZQdnc0M19kMjJoMHpmdTdib9IBb0FVX3lxTE1CeWxKclh1MmNaNzBtSXNFRzVMUXhwY3BUSEhKa1ZOZWRENWF4ZTRldDJTY3piVmhVYkxja0tfVFdrZUxGdlNDZGdDcUlWQzlKV0RUbU96WXhQcHR2cmZQdnc0M19kMjJoMHpmdTdibw?oc=5",
+      "https://news.google.com/rss/articles/CBMijwFBVV95cUxPWmNGblVESUNBbWVGdjZJOHpiU1I3ZTlKSDhla3VnemhFakZuWkxRaHUxOUNpejZ6bjNlY2Y5T0pPZWZFNEMwOWViSVJ5SUxYbUk0TWFwUEEzaVZXZkV0YUg0U1pBNC1idGM4ZlBfa3VQbm1oUTFFOGc5d3V4SFprbU5LQnZZdlJWczlXdGphNA?oc=5",
+      "https://news.google.com/rss/articles/CBMikwFBVV95cUxQSFlyZ25zRS1jVjgwZXFWQXBkQ1FjT2ZDdnRLaVdLR3dXVnZwVkxJdXJqcjZFMFZlY3N2Nnlxc2V1c0FRWThCRnE1bERqM0VmQWRteU9ocm1WVkNXM05hcV9QQnR2ZUFNWmpyTjhvcThJSjJIWkk4SVdsUjNwQXNhdHIyZTlKUi15d3FiMG9GVkhmZFU?oc=5",
+      "https://www.reddit.com/r/ProductManagement/comments/1ujnc3m/keeping_saas_docs_in_sync_with_product_changes/",
+      "https://www.reddit.com/r/ProductManagement_IN/comments/1ufz917/pm_gtm_engineering_revops_are_getting_compressed/",
+      "https://www.reddit.com/r/ProductManagement_IN/comments/1ujg4y1/curious_how_ai_tools_have_changed_pm_workflows/",
+      "https://www.reddit.com/r/ProductManagement_IN/comments/1ujq2d5/wired_ai_agents_into_my_entire_pm_stack_and_the/",
+      "https://www.youtube.com/shorts/cCgBAbUz4Sk",
+      "https://www.youtube.com/watch?v=-GaV25Reag0",
+      "https://www.youtube.com/watch?v=xm3Y3u2GP4g"
     ]
   }
 ]
