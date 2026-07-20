@@ -1,20 +1,5 @@
 [
   {
-    "date": "2026-07-12",
-    "links": [
-      "https://medium.com/impostor-syndrome-among-us-f13ec05d2492?source=user_profile_page---------0-------------f4da40af3196----------------------",
-      "https://news.google.com/rss/articles/CBMiX0FVX3lxTE4zN3hmVnJYbVJiRU1aUHF5MnBTZ0YxZFpCdTE3QnNmSUtYeWZ5TUw0T29MM1JTWVRKSnIwbWpPVWQybVdJRktxT19kdDJJVVNBVmRva0MtRng3ampzSnRj?oc=5",
-      "https://news.google.com/rss/articles/CBMizgFBVV95cUxNdU1LS3R2SF9oV1dTb0hVamhpZW1fOWdybXdlQnBLc1E3RU42UlRHQVpTRHp0OS03THlKLUlWWG1ma3laVHBNcmJQcWNfVjNvZFlnOGtxeG5BWGQ3bl9ZZ040NEFuMktKVGFhSUdPVVRheldJV3psdVNTUWczUWZvZ1hWck4tVHgwTmktQ1B2MVY1eEl5dmVVWVFVZUh3Z2pBM3g4R01pdVBuaC1XeF9oUkNJZVBVS2VyM1p0bmdJQS1Qa0Nfcnh4Y29yYVM2Zw?oc=5",
-      "https://www.reddit.com/r/ProductManagement/comments/1us0a2l/how_to_get_the_best_out_of_a_testflight_ios_beta/",
-      "https://www.reddit.com/r/ProductManagement/comments/1usa5v1/people_who_became_pms_after_doing_swe_what_do_you/",
-      "https://www.reddit.com/r/ProductManagement/comments/1ut03mf/best_resources_or_examples_for_product_strategy/",
-      "https://www.reddit.com/r/ProductManagement/comments/1uteh67/how_to_push_back_against_unrealistic_expectations/",
-      "https://www.youtube.com/shorts/B4_dot6SUb0",
-      "https://www.youtube.com/shorts/h_1x1UqI5ro",
-      "https://www.youtube.com/shorts/vr13eFx8BEk"
-    ]
-  },
-  {
     "date": "2026-07-13",
     "links": [
       "https://news.google.com/rss/articles/CBMib0FVX3lxTE1NRnJCVEROSkdJQmpkZmZ1RkhjQzRhLWtpVHI0ekllSUF3MUxFSTBVd0FmZU50eW5HNDB0Vk1MOU9QZ04xTDVMWEx2WHpfLVFSR1NTQ3NGaFROem5LUU5oLVBqR3FCQ1ZXMWR0cW53aw?oc=5",
@@ -108,6 +93,21 @@
       "https://www.youtube.com/watch?v=EyPiFfiBVdg",
       "https://www.youtube.com/watch?v=pYYOSdabJzw",
       "https://www.youtube.com/watch?v=xm3Y3u2GP4g"
+    ]
+  },
+  {
+    "date": "2026-07-20",
+    "links": [
+      "https://news.google.com/rss/articles/CBMi0AFBVV95cUxNQ0RJcWZhSzE1X2pKMEJHNzRZVndoSEZYdG5TVGVIZ2Q2R1F1WHNuYVlUenJSbmtlQW5VeWlXb2ZQbTZiT0dhdmp3Vl9DYzFDM0ZvY3dNSHA5a1RrWlY3a19qbkdkay1aVTc2ZjVxLXd3ODVNVlJwUFhKVVJPRnhWUVMwNHZISmdBM0x1VkhFMkJQd2xacnZLUXBlaFVyRFU3RDBPbnpaVVA3U3ozSXFOQmJpVFpxVmthMERuNjJzTF9FN0pISnJCb3EzQVR1QU5t0gHQAUFVX3lxTE1DRElxZmFLMTVfakowQkc3NFlWd2hIRlh0blNUZUhnZDZHUXVYc25hWVR6clJua2VBblV5aVdvZlBtNmJPR2F2andWX0NjMUMzRm9jd01IcDlrVGtaVjdrX2puR2RrLVpVNzZmNXEtd3c4NU1WUnBQWEpVUk9GeFZRUzA0dkhKZ0EzTHVWSEUyQlB3bFpydktRcGVoVXJEVTdEME9uelpVUDdTejNJcU5CYmlUWnFWa2EwRG42MnNMX0U3SkhKckJvcTNBVHVBTm0?oc=5",
+      "https://news.google.com/rss/articles/CBMijgFBVV95cUxNb0lWSWtISm5Zd0FId3RYYmlrRWtvZ0huQnptM1FEWEVsSXh4MldkMGVES1QwdDVWS19uYXZKOFFsR3lPTlVzSGlPb3k3dEFpSUptRG0zVERSdXJQSjh2ZmxiTnBsNjlVY21rczBUVDJmeEpWLVc5bDNCNVdRb25tUi1kT0ZqRUNZVGV4aFdn?oc=5",
+      "https://news.google.com/rss/articles/CBMitwFBVV95cUxPLS1Ia0RsMEJSWGpzY1JYUjdpMUVGUUxvS0U0OTl5Zm55d2NiWHpCS0xGcy1NNnZmMEI5RU5EXzRlMmxrOWVBSXo4eExQV25wVzUyNVRXTnlYNGtfM1duLVVCUXRBYUZrUlNQZWRUNjRtX1l5Y1JoRkZsQ3daVHhZQ1BORWt1LTl6U2IyTjNlbFpha1JJUHRJYnNKYmRIVDZEaDZXQ2E1Q3BSMldYNFUtSkY5MjlnUXM?oc=5",
+      "https://www.reddit.com/r/ProductManagement/comments/1v0ufzo/systems_thinking_in_a_world_with_ai/",
+      "https://www.reddit.com/r/ProductManagement/comments/1v0uro0/articlespodcasts_on_developing_a_cohesive_product/",
+      "https://www.reddit.com/r/ProductManagement/comments/1v0wtdl/whats_it_like_to_be_a_pm_of_an_unpopular_product/",
+      "https://www.reddit.com/r/ProductManagement/comments/1v18qeb/friction_with_engg/",
+      "https://www.youtube.com/shorts/2De481hOI4g",
+      "https://www.youtube.com/shorts/NiDZmfkQbcU",
+      "https://www.youtube.com/watch?v=t0GiTyz4syY"
     ]
   }
 ]
