@@ -1,17 +1,5 @@
 [
   {
-    "date": "2026-07-29",
-    "links": [
-      "https://news.google.com/rss/articles/CBMiY0FVX3lxTE0tcVAyZHB6YXpsWjVYUm84ZXpXU2dUMjNyclFlZFJvUkN4M0gzVHR4N1piUVlXSGtnTExZTk4tdmFjQ3k1bkJlTVVjZjNmRl9ZNlVPeHNJaWpvbTcwc1RINE9hSdIBaEFVX3lxTE9QOGoydDBDajZyM0d1NUF1QkNVd2VkRXUwUkxVa3NvX1RtYTBSV3B3REtGckRieWF0bldWdmZhVm41VzdqSVIzSXlmU01OZ0RTQWtfc0d4Q1pNamkyMzlyR1Z0cXlVdlJK?oc=5",
-      "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE1PRXRNUXhxclpEelRnQjUzN3liaURDT1VBSURkMFpQTG5ibUwyMVdfS2dNNllVREowSGdsbHhuZ0drMnhYSlFVdFdUT3JZMHR6TndGRGJTeXRvX2FNcnJ3bEE5ZVRWNlU?oc=5",
-      "https://news.google.com/rss/articles/CBMidEFVX3lxTFBqWi1kRzZrMVRmanFrRVJoRV9ldFJlZjhLNFFIcFhxcnNJbHJnOE9oT1pEMHc2WnZJY3ZhUm5pVnZqaFpGWVZ0cVQ5djdwX3FRVTJ3ZEdFaUZKN0oteFUyYzJkaUw0TFB5VlhiWlY5M1hjY3R6?oc=5",
-      "https://news.google.com/rss/articles/CBMiuwFBVV95cUxPU1lpX21POHRmdlJHdk5vV3A4dEluU0htLTlnS1Vleng1T1hDWGlDSXU5SzZFR0o2anl5aDZJMzZMWHkwNHdBckVaNW5wdHQ0SE5UcENRajVuRHdyRk5uT1hZX21VT1A4RkR2VGF1NWFUX1pkcWdNMU9YeDVWZ1J1enhjZERMUk1weFVVNlFjczh4dmwwMkhQaVJUMFdOZFpQZWp4Q0FqV05oaGdyNkotY2dacjlXZjlqX2p3?oc=5",
-      "https://www.reddit.com/r/ProductManagement/comments/1v8w8dh/does_anyone_still_write_tickets_anymore/",
-      "https://www.reddit.com/r/ProductManagement/comments/1v9blgt/need_help_as_a_qa_intern_to_build_confidence_with/",
-      "https://www.reddit.com/r/ProductManagement/comments/1v9lfbz/pm_coaching_from_manager_or_pm_org_is_it_that_rare/"
-    ]
-  },
-  {
     "date": "2026-07-30",
     "links": [
       "https://news.google.com/rss/articles/CBMiX0FVX3lxTE4zN3hmVnJYbVJiRU1aUHF5MnBTZ0YxZFpCdTE3QnNmSUtYeWZ5TUw0T29MM1JTWVRKSnIwbWpPVWQybVdJRktxT19kdDJJVVNBVmRva0MtRng3ampzSnRj?oc=5",
@@ -102,6 +90,18 @@
       "https://www.reddit.com/r/ProductManagement/comments/1u6pv0o/quarterly_career_thread/",
       "https://www.reddit.com/r/ProductManagement/comments/1vf3udu/design_sign_off/",
       "https://www.reddit.com/r/ProductManagement/comments/1vf8kxl/has_your_health_ever_taken_a_hit_from_your_job/"
+    ]
+  },
+  {
+    "date": "2026-08-06",
+    "links": [
+      "https://news.google.com/rss/articles/CBMiU0FVX3lxTE1pWXRyUW9MR29oYmlhdG9NSEZYV2RDN3F6QlhUQ3gzQ3BuVUVMU2hwa0dhYmdBTmhOQUEtaUdEdk5HR1ZLc1NLWkVsdnNSV1RNN3NJ?oc=5",
+      "https://news.google.com/rss/articles/CBMikgFBVV95cUxNeEMxVy1GV3RabV9GRkdXb1lOYTZvbkoxTUo4OXlLVmsyMk5kTXoybGlzUGhZM2s0QjlBcGFqejBEM19ST3RLSU1PRGVmZnBsQmJ2dnctOUhWN1ZSRWktTTFnbkZSOVlqNVRRbk0wWkt1bG5kU29PSWlvVGZqaW1PM1lIM2hkZjZzRFEtY1I0WXRGZw?oc=5",
+      "https://news.google.com/rss/articles/CBMilAFBVV95cUxQTjh6UzV4eWNSb2tMc3Q4Zk5YR21IbGpfU0NtYS05MzRIZVBWNkswYkhNN1FHakdOcVZ3ZTk2OFJNcEl0NHJNNVBoY1RKNWpKN1JBVU5RcjdudkRYU1VzMjNERlh5UktaUC1haU1lSjNHUTlJWGFudF9qMnRzUEF0VS1ZVjU4RGE4Zm9FRHRqM3kwM0Ji?oc=5",
+      "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQazJqOW14SFVTZEJIdUVsUDZxNWp0WXRPTHMxZmJmcENKeDNpU3dRMThNcWFzZFl4NjNRMEh6ckxGTGRUUjBwb1lwQkVzcllZQUxJYTEtSGpFU2tIY1h2MDlkaU1hdTNvcnBCRzBJcDJnWTFUYmlBTk1qazZ4NmZPb3NDUjZpb0daT1MtNVdiWnotZnEySHdYbUtSSk80RkVNQjlzM3poOGNaUQ?oc=5",
+      "https://www.reddit.com/r/ProductManagement/comments/1vfzusl/people_who_have_pmmiddle_managers_vibe_coding_how/",
+      "https://www.reddit.com/r/ProductManagement/comments/1vg5hg0/continuous_discovery_opportunity_solution_tree/",
+      "https://www.reddit.com/r/ProductManagement/comments/1vgils0/is_cybersecurity_important_for_pm/"
     ]
   }
 ]
